@@ -1,0 +1,4 @@
+com/example/phonesuggester/model/Phone.class
+com/example/phonesuggester/repository/PhoneRepository.class
+com/example/phonesuggester/DataLoader.class
+com/example/phonesuggester/PhoneSuggesterApplication.class
