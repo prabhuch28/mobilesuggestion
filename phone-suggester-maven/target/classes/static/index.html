@@ -1,884 +1,406 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>PhoneFinder - Find Your Perfect Phone</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"/>
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          colors: {
-            primary: '#4F46E5',
-            secondary: '#10B981',
-            accent: '#F59E0B',
-            dark: '#1F2937',
-            light: '#F9FAFB',
-          },
-          animation: {
-            'fade-in': 'fadeIn 0.5s ease-in-out',
-            'slide-up': 'slideUp 0.3s ease-out',
-            'bounce-slow': 'bounce 2s infinite',
-          }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Phone Suggester - Modern Phone Recommendations</title>
+    
+    <!-- React and ReactDOM -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    
+    <!-- Babel for JSX -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Custom Styles -->
+    <style>
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         }
-      }
-    }
-  </script>
-  <style>
-    @keyframes fadeIn {
-      from { opacity: 0; }
-      to { opacity: 1; }
-    }
-    @keyframes slideUp {
-      from { transform: translateY(20px); opacity: 0; }
-      to { transform: translateY(0); opacity: 1; }
-    }
-    .form-transition { transition: all 0.3s ease-in-out; }
-    .card-hover { 
-      transition: all 0.3s ease;
-      cursor: pointer;
-    }
-    .card-hover:hover { 
-      transform: translateY(-8px);
-      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-    }
-    .hidden { display: none !important; }
-    .gradient-bg {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    }
-    .glass-effect {
-      backdrop-filter: blur(10px);
-      background: rgba(255, 255, 255, 0.9);
-    }
-    .phone-card {
-      background: linear-gradient(145deg, #ffffff 0%, #f8fafc 100%);
-      border: 1px solid rgba(255, 255, 255, 0.2);
-    }
-    .rating-stars {
-      color: #fbbf24;
-    }
-    .price-tag {
-      background: linear-gradient(45deg, #10b981, #059669);
-    }
-    .discount-badge {
-      background: linear-gradient(45deg, #ef4444, #dc2626);
-    }
-  </style>
+        .card-hover {
+            transition: all 0.3s ease;
+        }
+        .card-hover:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .loading-spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
 </head>
-<body class="bg-gray-50 font-sans">
-<div class="min-h-screen flex flex-col">
+<body class="bg-gray-50">
+    <div id="root"></div>
 
-  <!-- Enhanced Splash Screen -->
-  <section id="splash-screen" class="flex justify-center items-center h-screen gradient-bg">
-    <div class="text-center animate-fade-in">
-      <div class="mb-8">
-        <i class="fas fa-mobile-alt text-8xl text-white animate-bounce-slow"></i>
-      </div>
-      <h1 class="text-6xl md:text-7xl font-bold text-white mb-4 tracking-tight">PhoneFinder</h1>
-      <p class="text-xl text-white/80 font-light">Discover Your Perfect Phone</p>
-      <div class="mt-8 flex justify-center space-x-2">
-        <div class="w-3 h-3 bg-white rounded-full animate-bounce"></div>
-        <div class="w-3 h-3 bg-white rounded-full animate-bounce" style="animation-delay: 0.1s;"></div>
-        <div class="w-3 h-3 bg-white rounded-full animate-bounce" style="animation-delay: 0.2s;"></div>
-      </div>
-    </div>
-  </section>
+    <script type="text/babel">
+        const { useState, useEffect } = React;
 
-  <!-- Enhanced Registration Section -->
-  <section id="register-section" class="form-transition hidden min-h-screen flex items-center gradient-bg">
-    <div class="container mx-auto px-6">
-      <div class="max-w-md mx-auto glass-effect p-8 rounded-2xl shadow-2xl animate-slide-up">
-        <div class="text-center mb-8">
-          <i class="fas fa-user-plus text-4xl text-primary mb-4"></i>
-          <h3 class="text-3xl font-bold text-dark mb-2">Create Account</h3>
-          <p class="text-gray-600">Join PhoneFinder today</p>
-        </div>
-        <form id="register-form" class="space-y-6">
-          <div class="grid grid-cols-2 gap-4">
-            <input type="text" id="firstName" placeholder="First Name" class="w-full px-4 py-3 bg-white/70 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent transition-all" required />
-            <input type="text" id="lastName" placeholder="Last Name" class="w-full px-4 py-3 bg-white/70 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent transition-all" required />
-          </div>
-          <input type="email" id="reg-email" placeholder="Email Address" class="w-full px-4 py-3 bg-white/70 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent transition-all" required />
-          <input type="password" id="reg-password" placeholder="Password" class="w-full px-4 py-3 bg-white/70 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent transition-all" required />
-          <input type="password" id="confirm-password" placeholder="Confirm Password" class="w-full px-4 py-3 bg-white/70 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent transition-all" required />
-          <button type="submit" class="w-full bg-primary text-white py-3 rounded-xl font-semibold hover:bg-primary/90 transform hover:scale-105 transition-all duration-200 shadow-lg">
-            Create Account
-          </button>
-          <p class="text-center text-gray-600">Already have an account? 
-            <button type="button" id="switch-to-login" class="text-primary font-semibold hover:underline">Sign In</button>
-          </p>
-        </form>
-      </div>
-    </div>
-  </section>
-
-  <!-- Enhanced Login Section -->
-  <section id="login-section" class="form-transition hidden min-h-screen flex items-center gradient-bg">
-    <div class="container mx-auto px-6">
-      <div class="max-w-md mx-auto glass-effect p-8 rounded-2xl shadow-2xl animate-slide-up">
-        <div class="text-center mb-8">
-          <i class="fas fa-sign-in-alt text-4xl text-primary mb-4"></i>
-          <h3 class="text-3xl font-bold text-dark mb-2">Welcome Back</h3>
-          <p class="text-gray-600">Sign in to your account</p>
-        </div>
-        <form id="login-form" class="space-y-6">
-          <input type="email" id="login-email" placeholder="Email Address" class="w-full px-4 py-3 bg-white/70 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent transition-all" required />
-          <input type="password" id="login-password" placeholder="Password" class="w-full px-4 py-3 bg-white/70 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent transition-all" required />
-          <button type="submit" class="w-full bg-primary text-white py-3 rounded-xl font-semibold hover:bg-primary/90 transform hover:scale-105 transition-all duration-200 shadow-lg">
-            Sign In
-          </button>
-          <p class="text-center text-gray-600">New to PhoneFinder? 
-            <button type="button" id="switch-to-register" class="text-primary font-semibold hover:underline">Create Account</button>
-          </p>
-        </form>
-      </div>
-    </div>
-  </section>
-
-  <!-- Enhanced Dashboard Section -->
-  <section id="dashboard-section" class="form-transition hidden">
-    <!-- Header -->
-    <header class="bg-white shadow-sm border-b border-gray-200">
-      <div class="container mx-auto px-6 py-4">
-        <div class="flex items-center justify-between">
-          <div class="flex items-center">
-            <i class="fas fa-mobile-alt text-2xl text-primary mr-3"></i>
-            <h1 class="text-2xl font-bold text-primary">PhoneFinder</h1>
-          </div>
-          <div class="flex items-center space-x-4">
-            <span class="text-gray-700">Welcome, <span id="user-name" class="font-semibold text-primary"></span>!</span>
-            <button id="logout-btn" class="px-4 py-2 text-sm font-medium text-gray-700 hover:text-gray-900 transition-colors">
-              <i class="fas fa-sign-out-alt mr-2"></i>Sign Out
-            </button>
-          </div>
-        </div>
-      </div>
-    </header>
-
-    <!-- Main Content -->
-    <main class="container mx-auto px-6 py-8">
-      <!-- Enhanced Search Filters -->
-      <div class="bg-white rounded-2xl shadow-lg p-6 mb-8 border border-gray-100">
-        <div class="flex items-center mb-6">
-          <i class="fas fa-search text-primary text-xl mr-3"></i>
-          <h2 class="text-xl font-bold text-dark">Find Your Perfect Phone</h2>
-        </div>
-        <form id="phone-search-form" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-          <select id="phone-type" class="px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent transition-all">
-            <option value="">All Types</option>
-            <option value="Flagship">Flagship</option>
-            <option value="Gaming">Gaming</option>
-            <option value="Camera">Camera Focused</option>
-            <option value="Mid-range">Mid-range</option>
-            <option value="Budget">Budget</option>
-          </select>
-          <select id="brand" class="px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent transition-all">
-            <option value="">All Brands</option>
-            <option value="Apple">Apple</option>
-            <option value="Samsung">Samsung</option>
-            <option value="Xiaomi">Xiaomi</option>
-            <option value="OnePlus">OnePlus</option>
-            <option value="Google">Google</option>
-            <option value="Realme">Realme</option>
-            <option value="Vivo">Vivo</option>
-            <option value="iQOO">iQOO</option>
-            <option value="Nothing">Nothing</option>
-            <option value="POCO">POCO</option>
-            <option value="Motorola">Motorola</option>
-          </select>
-          <select id="price-range" class="px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent transition-all">
-            <option value="">Any Price</option>
-            <option value="0-20000">Under ₹20,000</option>
-            <option value="20000-40000">₹20,000 - ₹40,000</option>
-            <option value="40000-70000">₹40,000 - ₹70,000</option>
-            <option value="70000-100000">₹70,000 - ₹1,00,000</option>
-            <option value="100000+">Above ₹1,00,000</option>
-          </select>
-          <select id="rating" class="px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent transition-all">
-            <option value="">Any Rating</option>
-            <option value="4">4+ Stars</option>
-            <option value="4.2">4.2+ Stars</option>
-            <option value="4.5">4.5+ Stars</option>
-          </select>
-        </form>
-        <div class="flex items-center justify-between">
-          <button type="submit" form="phone-search-form" class="px-8 py-3 bg-primary text-white rounded-xl font-semibold hover:bg-primary/90 transition-all duration-200 shadow-lg">
-            <i class="fas fa-search mr-2"></i>Search Phones
-          </button>
-          <button id="clear-filters" class="px-6 py-3 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-xl transition-all">
-            <i class="fas fa-times mr-2"></i>Clear Filters
-          </button>
-        </div>
-      </div>
-
-      <!-- Results Section -->
-      <div class="flex items-center justify-between mb-6">
-        <h3 class="text-xl font-bold text-dark">Available Phones</h3>
-        <span id="results-count" class="text-gray-600 bg-gray-100 px-3 py-1 rounded-full text-sm font-medium">0 phones found</span>
-      </div>
-      
-      <div id="results" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"></div>
-      
-      <!-- No Results Message -->
-      <div id="no-results" class="text-center py-12 hidden">
-        <i class="fas fa-search text-6xl text-gray-300 mb-4"></i>
-        <h3 class="text-xl font-semibold text-gray-600 mb-2">No phones found</h3>
-        <p class="text-gray-500 mb-4">Try adjusting your search criteria</p>
-        <button id="reset-search" class="px-6 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors">
-          Reset Search
-        </button>
-      </div>
-    </main>
-  </section>
-
-  <!-- Phone Details Modal -->
-  <div id="phone-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50 hidden">
-    <div class="bg-white rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto animate-slide-up">
-      <div class="p-6">
-        <div class="flex justify-between items-start mb-6">
-          <h2 id="modal-title" class="text-3xl font-bold text-dark"></h2>
-          <button id="close-modal" class="text-gray-400 hover:text-gray-600 transition-colors p-2">
-            <i class="fas fa-times text-xl"></i>
-          </button>
-        </div>
-        
-        <div class="grid md:grid-cols-2 gap-8">
-          <div>
-            <img id="modal-image" src="" alt="" class="w-full h-80 object-cover rounded-xl shadow-lg">
-            <div class="mt-4 flex items-center justify-between">
-              <div class="flex items-center">
-                <div id="modal-rating" class="flex items-center rating-stars mr-2"></div>
-                <span id="modal-reviews" class="text-gray-600 text-sm"></span>
-              </div>
-              <span id="modal-availability" class="px-3 py-1 rounded-full text-sm font-medium"></span>
-            </div>
-          </div>
-          
-          <div class="space-y-6">
-            <div>
-              <div class="flex items-baseline mb-4">
-                <span id="modal-price" class="text-3xl font-bold text-secondary"></span>
-                <span id="modal-original-price" class="text-lg text-gray-500 line-through ml-2"></span>
-                <span id="modal-discount" class="ml-2 px-2 py-1 bg-red-500 text-white text-sm rounded-full"></span>
-              </div>
-            </div>
+        // API Service
+        const apiService = {
+            async getPhones(page = 0, size = 10) {
+                const response = await fetch(`/api/v1/phones?page=${page}&size=${size}`);
+                const data = await response.json();
+                return data.data;
+            },
             
-            <div>
-              <h3 class="font-semibold text-dark mb-3 text-lg">Specifications</h3>
-              <div id="modal-specs" class="space-y-3"></div>
-            </div>
+            async searchPhones(query) {
+                const response = await fetch(`/api/v1/phones/search?query=${encodeURIComponent(query)}`);
+                const data = await response.json();
+                return data.data;
+            },
             
-            <div>
-              <h3 class="font-semibold text-dark mb-3 text-lg">Features</h3>
-              <div id="modal-features" class="flex flex-wrap gap-2"></div>
-            </div>
+            async getPhonesByBrand(brand) {
+                const response = await fetch(`/api/v1/phones/brand/${encodeURIComponent(brand)}`);
+                const data = await response.json();
+                return data.data;
+            },
             
-            <div class="flex gap-4 pt-4">
-              <button class="flex-1 bg-primary text-white py-3 rounded-xl font-semibold hover:bg-primary/90 transition-all">
-                <i class="fas fa-shopping-cart mr-2"></i>Add to Cart
-              </button>
-              <button class="px-6 py-3 border-2 border-primary text-primary rounded-xl hover:bg-primary hover:text-white transition-all">
-                <i class="fas fa-heart"></i>
-              </button>
+            async getPhonesByPriceRange(minPrice, maxPrice) {
+                const response = await fetch(`/api/v1/phones/price-range?minPrice=${minPrice}&maxPrice=${maxPrice}`);
+                const data = await response.json();
+                return data.data;
+            }
+        };
+
+        // Phone Card Component
+        const PhoneCard = ({ phone }) => (
+            <div className="bg-white rounded-lg shadow-md card-hover overflow-hidden">
+                <div className="relative">
+                    <img 
+                        src={phone.imageUrl || 'https://via.placeholder.com/300x200?text=Phone+Image'} 
+                        alt={phone.name}
+                        className="w-full h-48 object-cover"
+                        onError={(e) => {
+                            e.target.src = 'https://via.placeholder.com/300x200?text=Phone+Image';
+                        }}
+                    />
+                    <div className="absolute top-2 right-2 bg-blue-500 text-white px-2 py-1 rounded-full text-xs font-semibold">
+                        {phone.currency} {phone.price?.toLocaleString()}
+                    </div>
+                </div>
+                <div className="p-4">
+                    <h3 className="text-lg font-semibold text-gray-800 mb-2">{phone.name}</h3>
+                    <p className="text-sm text-gray-600 mb-3 line-clamp-2">{phone.description}</p>
+                    
+                    <div className="flex items-center justify-between mb-3">
+                        <span className="text-sm text-gray-500">{phone.brand}</span>
+                        <div className="flex items-center">
+                            <i className="fas fa-star text-yellow-400 mr-1"></i>
+                            <span className="text-sm font-medium">{phone.rating}</span>
+                        </div>
+                    </div>
+                    
+                    <div className="flex flex-wrap gap-1 mb-3">
+                        {phone.usageTypes?.map((type, index) => (
+                            <span key={index} className="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded">
+                                {type}
+                            </span>
+                        ))}
+                    </div>
+                    
+                    <div className="grid grid-cols-2 gap-2 text-xs text-gray-600">
+                        <div><i className="fas fa-mobile-alt mr-1"></i> {phone.screenSize}"</div>
+                        <div><i className="fas fa-memory mr-1"></i> {phone.storageGB}GB</div>
+                        <div><i className="fas fa-microchip mr-1"></i> {phone.ramGB}GB RAM</div>
+                        <div><i className="fas fa-battery-full mr-1"></i> {phone.batteryCapacity}mAh</div>
+                    </div>
+                </div>
             </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
+        );
 
-<script>
-  // Enhanced phone database with more options
-  const phoneDatabase = [
-    {
-      id: 1,
-      name: "iPhone 15 Pro Max",
-      brand: "Apple",
-      type: "Flagship",
-      price: 134900,
-      originalPrice: 159900,
-      image: "https://images.pexels.com/photos/14651148/pexels-photo-14651148.jpeg?auto=compress&cs=tinysrgb&w=400",
-      specs: {
-        display: "6.7\" Super Retina XDR",
-        processor: "A17 Pro Bionic",
-        ram: "8GB",
-        storage: "256GB",
-        camera: "48MP Triple Camera",
-        battery: "4441mAh",
-        os: "iOS 17"
-      },
-      features: ["5G", "Face ID", "Wireless Charging", "Water Resistant", "USB-C"],
-      rating: 4.8,
-      reviews: 15432,
-      availability: "in-stock"
-    },
-    {
-      id: 2,
-      name: "Galaxy S24 Ultra",
-      brand: "Samsung",
-      type: "Flagship",
-      price: 124999,
-      originalPrice: 134999,
-      image: "https://images.pexels.com/photos/14651096/pexels-photo-14651096.jpeg?auto=compress&cs=tinysrgb&w=400",
-      specs: {
-        display: "6.8\" Dynamic AMOLED 2X",
-        processor: "Snapdragon 8 Gen 3",
-        ram: "12GB",
-        storage: "256GB",
-        camera: "200MP Quad Camera",
-        battery: "5000mAh",
-        os: "Android 14"
-      },
-      features: ["5G", "S Pen", "Ultra Zoom", "DeX Mode", "Wireless PowerShare"],
-      rating: 4.7,
-      reviews: 12876,
-      availability: "in-stock"
-    },
-    {
-      id: 3,
-      name: "Xiaomi 14 Ultra",
-      brand: "Xiaomi",
-      type: "Camera",
-      price: 99999,
-      originalPrice: 109999,
-      image: "https://images.pexels.com/photos/14651134/pexels-photo-14651134.jpeg?auto=compress&cs=tinysrgb&w=400",
-      specs: {
-        display: "6.73\" AMOLED",
-        processor: "Snapdragon 8 Gen 3",
-        ram: "12GB",
-        storage: "256GB",
-        camera: "50MP Leica Quad",
-        battery: "5300mAh",
-        os: "MIUI 15"
-      },
-      features: ["5G", "Leica Optics", "120W Fast Charging", "IP68", "Dolby Vision"],
-      rating: 4.6,
-      reviews: 8945,
-      availability: "limited"
-    },
-    {
-      id: 4,
-      name: "OnePlus 12",
-      brand: "OnePlus",
-      type: "Gaming",
-      price: 64999,
-      originalPrice: 69999,
-      image: "https://images.pexels.com/photos/14651121/pexels-photo-14651121.jpeg?auto=compress&cs=tinysrgb&w=400",
-      specs: {
-        display: "6.82\" Fluid AMOLED",
-        processor: "Snapdragon 8 Gen 3",
-        ram: "16GB",
-        storage: "256GB",
-        camera: "50MP Hasselblad Triple",
-        battery: "5400mAh",
-        os: "OxygenOS 14"
-      },
-      features: ["5G", "Hasselblad", "100W SuperVOOC", "Gaming Mode", "Alert Slider"],
-      rating: 4.5,
-      reviews: 7234,
-      availability: "in-stock"
-    },
-    {
-      id: 5,
-      name: "Pixel 8 Pro",
-      brand: "Google",
-      type: "Camera",
-      price: 84999,
-      originalPrice: 94999,
-      image: "https://images.pexels.com/photos/14651089/pexels-photo-14651089.jpeg?auto=compress&cs=tinysrgb&w=400",
-      specs: {
-        display: "6.7\" LTPO OLED",
-        processor: "Google Tensor G3",
-        ram: "12GB",
-        storage: "128GB",
-        camera: "50MP Pro Triple",
-        battery: "5050mAh",
-        os: "Android 14"
-      },
-      features: ["5G", "AI Photography", "Magic Eraser", "Call Screen", "Pure Android"],
-      rating: 4.4,
-      reviews: 6543,
-      availability: "in-stock"
-    },
-    {
-      id: 6,
-      name: "Redmi Note 13 Pro+",
-      brand: "Xiaomi",
-      type: "Mid-range",
-      price: 24999,
-      originalPrice: 29999,
-      image: "https://images.pexels.com/photos/14651152/pexels-photo-14651152.jpeg?auto=compress&cs=tinysrgb&w=400",
-      specs: {
-        display: "6.67\" AMOLED",
-        processor: "MediaTek Dimensity 7200",
-        ram: "8GB",
-        storage: "256GB",
-        camera: "200MP OIS Triple",
-        battery: "5000mAh",
-        os: "MIUI 14"
-      },
-      features: ["5G", "OIS Camera", "120W Fast Charging", "IP54", "Stereo Speakers"],
-      rating: 4.3,
-      reviews: 9876,
-      availability: "in-stock"
-    },
-    {
-      id: 7,
-      name: "Realme GT 5 Pro",
-      brand: "Realme",
-      type: "Gaming",
-      price: 42999,
-      originalPrice: 47999,
-      image: "https://images.pexels.com/photos/14651145/pexels-photo-14651145.jpeg?auto=compress&cs=tinysrgb&w=400",
-      specs: {
-        display: "6.78\" AMOLED 144Hz",
-        processor: "Snapdragon 8 Gen 2",
-        ram: "12GB",
-        storage: "256GB",
-        camera: "50MP Sony IMX890",
-        battery: "5400mAh",
-        os: "Realme UI 5.0"
-      },
-      features: ["5G", "144Hz Display", "100W SuperVOOC", "Gaming Triggers", "VC Cooling"],
-      rating: 4.2,
-      reviews: 5432,
-      availability: "in-stock"
-    },
-    {
-      id: 8,
-      name: "Vivo V30 Pro",
-      brand: "Vivo",
-      type: "Camera",
-      price: 39999,
-      originalPrice: 44999,
-      image: "https://images.pexels.com/photos/14651140/pexels-photo-14651140.jpeg?auto=compress&cs=tinysrgb&w=400",
-      specs: {
-        display: "6.78\" AMOLED Curved",
-        processor: "MediaTek Dimensity 8200",
-        ram: "12GB",
-        storage: "256GB",
-        camera: "50MP Aura Light Portrait",
-        battery: "5000mAh",
-        os: "Funtouch OS 14"
-      },
-      features: ["5G", "Aura Light", "Curved Display", "80W Fast Charging", "Zeiss Optics"],
-      rating: 4.1,
-      reviews: 4321,
-      availability: "limited"
-    },
-    {
-      id: 9,
-      name: "iQOO 12",
-      brand: "iQOO",
-      type: "Gaming",
-      price: 52999,
-      originalPrice: 57999,
-      image: "https://images.pexels.com/photos/14651093/pexels-photo-14651093.jpeg?auto=compress&cs=tinysrgb&w=400",
-      specs: {
-        display: "6.78\" AMOLED 144Hz",
-        processor: "Snapdragon 8 Gen 3",
-        ram: "12GB",
-        storage: "256GB",
-        camera: "50MP OIS Triple",
-        battery: "5000mAh",
-        os: "Funtouch OS 14"
-      },
-      features: ["5G", "Gaming Beast", "120W Flash Charge", "Monster Touch", "RGB Light"],
-      rating: 4.4,
-      reviews: 3876,
-      availability: "in-stock"
-    },
-    {
-      id: 10,
-      name: "Nothing Phone (2a)",
-      brand: "Nothing",
-      type: "Mid-range",
-      price: 23999,
-      originalPrice: 25999,
-      image: "https://images.pexels.com/photos/14651116/pexels-photo-14651116.jpeg?auto=compress&cs=tinysrgb&w=400",
-      specs: {
-        display: "6.7\" Flexible OLED",
-        processor: "MediaTek Dimensity 7200 Pro",
-        ram: "8GB",
-        storage: "128GB",
-        camera: "50MP Dual Camera",
-        battery: "5000mAh",
-        os: "Nothing OS 2.5"
-      },
-      features: ["5G", "Glyph Interface", "Clean Android", "45W Fast Charging", "Unique Design"],
-      rating: 4.0,
-      reviews: 2987,
-      availability: "in-stock"
-    },
-    {
-      id: 11,
-      name: "POCO X6 Pro",
-      brand: "POCO",
-      type: "Budget",
-      price: 18999,
-      originalPrice: 21999,
-      image: "https://images.pexels.com/photos/14651106/pexels-photo-14651106.jpeg?auto=compress&cs=tinysrgb&w=400",
-      specs: {
-        display: "6.67\" AMOLED 120Hz",
-        processor: "MediaTek Dimensity 8300-Ultra",
-        ram: "8GB",
-        storage: "256GB",
-        camera: "64MP OIS Triple",
-        battery: "5000mAh",
-        os: "MIUI 14 for POCO"
-      },
-      features: ["5G", "OIS Camera", "67W Turbo Charging", "Liquid Cool Technology", "Corning Gorilla Glass"],
-      rating: 4.2,
-      reviews: 8765,
-      availability: "in-stock"
-    },
-    {
-      id: 12,
-      name: "Moto Edge 50 Pro",
-      brand: "Motorola",
-      type: "Mid-range",
-      price: 31999,
-      originalPrice: 35999,
-      image: "https://images.pexels.com/photos/14651129/pexels-photo-14651129.jpeg?auto=compress&cs=tinysrgb&w=400",
-      specs: {
-        display: "6.7\" pOLED Curved",
-        processor: "Snapdragon 7 Gen 3",
-        ram: "8GB",
-        storage: "256GB",
-        camera: "50MP OIS Triple",
-        battery: "4500mAh",
-        os: "Android 14"
-      },
-      features: ["5G", "Curved Display", "125W TurboPower", "Dolby Atmos", "Ready For PC"],
-      rating: 4.1,
-      reviews: 3456,
-      availability: "in-stock"
-    }
-  ];
+        // Search Filters Component
+        const SearchFilters = ({ onSearch, onFilterChange }) => {
+            const [filters, setFilters] = useState({
+                query: '',
+                brand: '',
+                minPrice: '',
+                maxPrice: '',
+                usageType: ''
+            });
 
-  let currentPhones = [...phoneDatabase];
+            const handleFilterChange = (key, value) => {
+                const newFilters = { ...filters, [key]: value };
+                setFilters(newFilters);
+                onFilterChange(newFilters);
+            };
 
-  // Utility functions
-  function formatPrice(price) {
-    return new Intl.NumberFormat('en-IN', {
-      style: 'currency',
-      currency: 'INR',
-      maximumFractionDigits: 0,
-    }).format(price);
-  }
+            const handleSearch = () => {
+                onSearch(filters);
+            };
 
-  function getAvailabilityInfo(availability) {
-    const info = {
-      'in-stock': { text: 'In Stock', class: 'bg-green-100 text-green-800' },
-      'limited': { text: 'Limited Stock', class: 'bg-yellow-100 text-yellow-800' },
-      'out-of-stock': { text: 'Out of Stock', class: 'bg-red-100 text-red-800' }
-    };
-    return info[availability] || { text: 'Unknown', class: 'bg-gray-100 text-gray-800' };
-  }
+            return (
+                <div className="bg-white rounded-lg shadow-md p-6 mb-6">
+                    <h2 className="text-xl font-semibold mb-4 text-gray-800">
+                        <i className="fas fa-search mr-2 text-blue-500"></i>
+                        Find Your Perfect Phone
+                    </h2>
+                    
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+                        <input
+                            type="text"
+                            placeholder="Search phones..."
+                            className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                            value={filters.query}
+                            onChange={(e) => handleFilterChange('query', e.target.value)}
+                        />
+                        
+                        <select
+                            className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                            value={filters.brand}
+                            onChange={(e) => handleFilterChange('brand', e.target.value)}
+                        >
+                            <option value="">All Brands</option>
+                            <option value="Apple">Apple</option>
+                            <option value="Samsung">Samsung</option>
+                            <option value="Xiaomi">Xiaomi</option>
+                            <option value="OnePlus">OnePlus</option>
+                            <option value="Google">Google</option>
+                        </select>
+                        
+                        <select
+                            className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                            value={filters.usageType}
+                            onChange={(e) => handleFilterChange('usageType', e.target.value)}
+                        >
+                            <option value="">All Types</option>
+                            <option value="Gaming">Gaming</option>
+                            <option value="Camera">Camera</option>
+                            <option value="Business">Business</option>
+                            <option value="Budget">Budget</option>
+                            <option value="Flagship">Flagship</option>
+                        </select>
+                        
+                        <input
+                            type="number"
+                            placeholder="Min Price"
+                            className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                            value={filters.minPrice}
+                            onChange={(e) => handleFilterChange('minPrice', e.target.value)}
+                        />
+                        
+                        <input
+                            type="number"
+                            placeholder="Max Price"
+                            className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                            value={filters.maxPrice}
+                            onChange={(e) => handleFilterChange('maxPrice', e.target.value)}
+                        />
+                    </div>
+                    
+                    <div className="mt-4 flex gap-2">
+                        <button
+                            onClick={handleSearch}
+                            className="bg-blue-500 text-white px-6 py-2 rounded-lg hover:bg-blue-600 transition-colors flex items-center"
+                        >
+                            <i className="fas fa-search mr-2"></i>
+                            Search
+                        </button>
+                        
+                        <button
+                            onClick={() => {
+                                setFilters({
+                                    query: '',
+                                    brand: '',
+                                    minPrice: '',
+                                    maxPrice: '',
+                                    usageType: ''
+                                });
+                                onSearch({});
+                            }}
+                            className="bg-gray-500 text-white px-6 py-2 rounded-lg hover:bg-gray-600 transition-colors flex items-center"
+                        >
+                            <i className="fas fa-times mr-2"></i>
+                            Clear
+                        </button>
+                    </div>
+                </div>
+            );
+        };
 
-  function generateStars(rating) {
-    const fullStars = Math.floor(rating);
-    const hasHalfStar = rating % 1 !== 0;
-    let starsHTML = '';
-    
-    for (let i = 0; i < fullStars; i++) {
-      starsHTML += '<i class="fas fa-star"></i>';
-    }
-    if (hasHalfStar) {
-      starsHTML += '<i class="fas fa-star-half-alt"></i>';
-    }
-    for (let i = fullStars + (hasHalfStar ? 1 : 0); i < 5; i++) {
-      starsHTML += '<i class="far fa-star"></i>';
-    }
-    
-    return starsHTML;
-  }
+        // Main App Component
+        const App = () => {
+            const [phones, setPhones] = useState([]);
+            const [loading, setLoading] = useState(false);
+            const [error, setError] = useState(null);
+            const [currentPage, setCurrentPage] = useState(0);
+            const [totalPages, setTotalPages] = useState(0);
 
-  function createPhoneCard(phone) {
-    const availabilityInfo = getAvailabilityInfo(phone.availability);
-    const discount = phone.originalPrice ? Math.round((1 - phone.price / phone.originalPrice) * 100) : 0;
-    
-    return `
-      <div class="phone-card card-hover rounded-2xl shadow-lg overflow-hidden border border-gray-100" data-phone-id="${phone.id}">
-        <div class="relative">
-          <img src="${phone.image}" alt="${phone.name}" class="w-full h-48 object-cover">
-          <div class="absolute top-3 left-3">
-            <span class="px-2 py-1 rounded-full text-xs font-medium ${availabilityInfo.class}">
-              ${availabilityInfo.text}
-            </span>
-          </div>
-          <div class="absolute top-3 right-3">
-            <button class="p-2 bg-white/90 backdrop-blur-sm rounded-full hover:bg-white hover:scale-110 transition-all shadow-lg">
-              <i class="far fa-heart text-gray-600 hover:text-red-500 transition-colors"></i>
-            </button>
-          </div>
-          ${discount > 0 ? `
-            <div class="absolute bottom-3 left-3">
-              <span class="discount-badge text-white px-2 py-1 rounded-lg text-sm font-semibold">
-                ${discount}% OFF
-              </span>
-            </div>
-          ` : ''}
-        </div>
-        
-        <div class="p-5">
-          <div class="mb-3">
-            <h3 class="text-lg font-bold text-dark mb-1 line-clamp-1">${phone.name}</h3>
-            <p class="text-gray-600 text-sm">${phone.brand} • ${phone.type}</p>
-          </div>
-          
-          <div class="flex items-center mb-3">
-            <div class="flex items-center rating-stars text-sm mr-2">
-              ${generateStars(phone.rating)}
-            </div>
-            <span class="text-sm font-medium text-gray-700">${phone.rating}</span>
-            <span class="text-sm text-gray-500 ml-1">(${phone.reviews.toLocaleString()})</span>
-          </div>
-          
-          <div class="grid grid-cols-2 gap-2 mb-4 text-xs">
-            <div class="flex items-center text-gray-600">
-              <i class="fas fa-mobile-alt text-primary mr-1"></i>
-              <span class="truncate">${phone.specs.display.split(' ')[0]}</span>
-            </div>
-            <div class="flex items-center text-gray-600">
-              <i class="fas fa-microchip text-purple-500 mr-1"></i>
-              <span class="truncate">${phone.specs.ram}</span>
-            </div>
-            <div class="flex items-center text-gray-600">
-              <i class="fas fa-camera text-green-500 mr-1"></i>
-              <span class="truncate">${phone.specs.camera.split(' ')[0]}</span>
-            </div>
-            <div class="flex items-center text-gray-600">
-              <i class="fas fa-battery-three-quarters text-blue-500 mr-1"></i>
-              <span class="truncate">${phone.specs.battery}</span>
-            </div>
-          </div>
-          
-          <div class="flex flex-wrap gap-1 mb-4">
-            ${phone.features.slice(0, 3).map(feature => 
-              `<span class="px-2 py-1 bg-primary/10 text-primary text-xs rounded-full font-medium">${feature}</span>`
-            ).join('')}
-            ${phone.features.length > 3 ? 
-              `<span class="px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded-full font-medium">+${phone.features.length - 3}</span>` 
-              : ''}
-          </div>
-          
-          <div class="flex items-end justify-between mb-4">
-            <div>
-              <div class="flex items-baseline">
-                <span class="text-xl font-bold text-dark">${formatPrice(phone.price)}</span>
-                ${phone.originalPrice && phone.originalPrice > phone.price ? 
-                  `<span class="text-sm text-gray-500 line-through ml-2">${formatPrice(phone.originalPrice)}</span>` 
-                  : ''}
-              </div>
-            </div>
-          </div>
-          
-          <div class="flex gap-2">
-            <button class="flex-1 bg-primary text-white py-2 rounded-xl font-medium hover:bg-primary/90 transition-colors text-sm">
-              <i class="fas fa-eye mr-1"></i>View Details
-            </button>
-            <button class="px-3 py-2 border-2 border-primary text-primary rounded-xl hover:bg-primary hover:text-white transition-all">
-              <i class="fas fa-shopping-cart text-sm"></i>
-            </button>
-          </div>
-        </div>
-      </div>
-    `;
-  }
+            const loadPhones = async (page = 0) => {
+                setLoading(true);
+                setError(null);
+                try {
+                    const data = await apiService.getPhones(page);
+                    setPhones(data.content || data);
+                    setTotalPages(data.totalPages || 0);
+                    setCurrentPage(page);
+                } catch (err) {
+                    setError('Failed to load phones. Please try again.');
+                    console.error('Error loading phones:', err);
+                } finally {
+                    setLoading(false);
+                }
+            };
 
-  function displayPhones(phones) {
-    const resultsContainer = document.getElementById('results');
-    const resultsCount = document.getElementById('results-count');
-    const noResults = document.getElementById('no-results');
-    
-    resultsCount.textContent = `${phones.length} phones found`;
-    
-    if (phones.length === 0) {
-      resultsContainer.innerHTML = '';
-      noResults.classList.remove('hidden');
-    } else {
-      noResults.classList.add('hidden');
-      resultsContainer.innerHTML = phones.map(createPhoneCard).join('');
-      
-      // Add click event listeners to phone cards
-      document.querySelectorAll('.phone-card').forEach(card => {
-        card.addEventListener('click', (e) => {
-          if (!e.target.closest('button')) {
-            const phoneId = parseInt(card.dataset.phoneId);
-            const phone = phoneDatabase.find(p => p.id === phoneId);
-            showPhoneModal(phone);
-          }
-        });
-      });
-    }
-  }
+            const handleSearch = async (filters) => {
+                setLoading(true);
+                setError(null);
+                try {
+                    let results = [];
+                    
+                    if (filters.query) {
+                        results = await apiService.searchPhones(filters.query);
+                    } else if (filters.brand) {
+                        results = await apiService.getPhonesByBrand(filters.brand);
+                    } else if (filters.minPrice && filters.maxPrice) {
+                        results = await apiService.getPhonesByPriceRange(
+                            parseFloat(filters.minPrice), 
+                            parseFloat(filters.maxPrice)
+                        );
+                    } else {
+                        results = await apiService.getPhones();
+                    }
+                    
+                    setPhones(results);
+                    setCurrentPage(0);
+                } catch (err) {
+                    setError('Search failed. Please try again.');
+                    console.error('Search error:', err);
+                } finally {
+                    setLoading(false);
+                }
+            };
 
-  function showPhoneModal(phone) {
-    const modal = document.getElementById('phone-modal');
-    const availabilityInfo = getAvailabilityInfo(phone.availability);
-    const discount = phone.originalPrice ? Math.round((1 - phone.price / phone.originalPrice) * 100) : 0;
-    
-    document.getElementById('modal-title').textContent = phone.name;
-    document.getElementById('modal-image').src = phone.image;
-    document.getElementById('modal-image').alt = phone.name;
-    document.getElementById('modal-rating').innerHTML = generateStars(phone.rating);
-    document.getElementById('modal-reviews').textContent = `(${phone.reviews.toLocaleString()} reviews)`;
-    document.getElementById('modal-availability').textContent = availabilityInfo.text;
-    document.getElementById('modal-availability').className = `px-3 py-1 rounded-full text-sm font-medium ${availabilityInfo.class}`;
-    document.getElementById('modal-price').textContent = formatPrice(phone.price);
-    
-    const originalPriceEl = document.getElementById('modal-original-price');
-    const discountEl = document.getElementById('modal-discount');
-    
-    if (phone.originalPrice && phone.originalPrice > phone.price) {
-      originalPriceEl.textContent = formatPrice(phone.originalPrice);
-      originalPriceEl.style.display = 'inline';
-      discountEl.textContent = `${discount}% OFF`;
-      discountEl.style.display = 'inline';
-    } else {
-      originalPriceEl.style.display = 'none';
-      discountEl.style.display = 'none';
-    }
-    
-    // Specifications
-    const specsContainer = document.getElementById('modal-specs');
-    specsContainer.innerHTML = Object.entries(phone.specs).map(([key, value]) => `
-      <div class="flex justify-between py-2 border-b border-gray-100">
-        <span class="text-gray-600 capitalize">${key.replace(/([A-Z])/g, ' $1')}:</span>
-        <span class="font-medium text-dark">${value}</span>
-      </div>
-    `).join('');
-    
-    // Features
-    const featuresContainer = document.getElementById('modal-features');
-    featuresContainer.innerHTML = phone.features.map(feature => 
-      `<span class="px-3 py-1 bg-primary/10 text-primary text-sm rounded-full font-medium">${feature}</span>`
-    ).join('');
-    
-    modal.classList.remove('hidden');
-    document.body.style.overflow = 'hidden';
-  }
+            useEffect(() => {
+                loadPhones();
+            }, []);
 
-  function hidePhoneModal() {
-    document.getElementById('phone-modal').classList.add('hidden');
-    document.body.style.overflow = 'auto';
-  }
+            return (
+                <div className="min-h-screen bg-gray-50">
+                    {/* Header */}
+                    <header className="gradient-bg text-white shadow-lg">
+                        <div className="container mx-auto px-6 py-8">
+                            <div className="flex items-center justify-between">
+                                <div>
+                                    <h1 className="text-3xl font-bold">
+                                        <i className="fas fa-mobile-alt mr-3"></i>
+                                        Phone Suggester
+                                    </h1>
+                                    <p className="text-blue-100 mt-2">
+                                        Find your perfect smartphone with AI-powered recommendations
+                                    </p>
+                                </div>
+                                <div className="text-right">
+                                    <div className="text-2xl font-bold">{phones.length}</div>
+                                    <div className="text-blue-100">Phones Available</div>
+                                </div>
+                            </div>
+                        </div>
+                    </header>
 
-  function filterPhones() {
-    const phoneType = document.getElementById('phone-type').value;
-    const brand = document.getElementById('brand').value;
-    const priceRange = document.getElementById('price-range').value;
-    const rating = parseFloat(document.getElementById('rating').value);
-    
-    let filtered = phoneDatabase.filter(phone => {
-      let matches = true;
-      
-      if (phoneType && phone.type !== phoneType) matches = false;
-      if (brand && phone.brand !== brand) matches = false;
-      if (rating && phone.rating < rating) matches = false;
-      
-      if (priceRange) {
-        if (priceRange.includes('+')) {
-          const minPrice = parseInt(priceRange.replace('+', ''));
-          if (phone.price < minPrice) matches = false;
-        } else {
-          const [min, max] = priceRange.split('-').map(Number);
-          if (phone.price < min || phone.price > max) matches = false;
-        }
-      }
-      
-      return matches;
-    });
-    
-    currentPhones = filtered;
-    displayPhones(filtered);
-  }
+                    {/* Main Content */}
+                    <main className="container mx-auto px-6 py-8">
+                        <SearchFilters onSearch={handleSearch} />
+                        
+                        {/* Loading State */}
+                        {loading && (
+                            <div className="flex justify-center items-center py-12">
+                                <div className="loading-spinner"></div>
+                                <span className="ml-3 text-gray-600">Loading phones...</span>
+                            </div>
+                        )}
+                        
+                        {/* Error State */}
+                        {error && (
+                            <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-6">
+                                <i className="fas fa-exclamation-triangle mr-2"></i>
+                                {error}
+                            </div>
+                        )}
+                        
+                        {/* Phones Grid */}
+                        {!loading && !error && (
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                                {phones.map((phone, index) => (
+                                    <div key={phone.id || index} className="fade-in">
+                                        <PhoneCard phone={phone} />
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+                        
+                        {/* Empty State */}
+                        {!loading && !error && phones.length === 0 && (
+                            <div className="text-center py-12">
+                                <i className="fas fa-mobile-alt text-6xl text-gray-300 mb-4"></i>
+                                <h3 className="text-xl font-semibold text-gray-600 mb-2">No phones found</h3>
+                                <p className="text-gray-500">Try adjusting your search criteria</p>
+                            </div>
+                        )}
+                        
+                        {/* Pagination */}
+                        {totalPages > 1 && (
+                            <div className="flex justify-center mt-8">
+                                <div className="flex space-x-2">
+                                    <button
+                                        onClick={() => loadPhones(currentPage - 1)}
+                                        disabled={currentPage === 0}
+                                        className="px-4 py-2 border border-gray-300 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
+                                    >
+                                        <i className="fas fa-chevron-left mr-1"></i>
+                                        Previous
+                                    </button>
+                                    
+                                    <span className="px-4 py-2 text-gray-600">
+                                        Page {currentPage + 1} of {totalPages}
+                                    </span>
+                                    
+                                    <button
+                                        onClick={() => loadPhones(currentPage + 1)}
+                                        disabled={currentPage >= totalPages - 1}
+                                        className="px-4 py-2 border border-gray-300 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
+                                    >
+                                        Next
+                                        <i className="fas fa-chevron-right ml-1"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        )}
+                    </main>
 
-  function clearFilters() {
-    document.getElementById('phone-type').value = '';
-    document.getElementById('brand').value = '';
-    document.getElementById('price-range').value = '';
-    document.getElementById('rating').value = '';
-    currentPhones = [...phoneDatabase];
-    displayPhones(currentPhones);
-  }
+                    {/* Footer */}
+                    <footer className="bg-gray-800 text-white py-8 mt-12">
+                        <div className="container mx-auto px-6 text-center">
+                            <p>&copy; 2024 Phone Suggester. Modern phone recommendations powered by AI.</p>
+                        </div>
+                    </footer>
+                </div>
+            );
+        };
 
-  // Event Listeners
-  window.addEventListener('load', () => {
-    setTimeout(() => {
-      document.getElementById('splash-screen').classList.add('hidden');
-      document.getElementById('register-section').classList.remove('hidden');
-    }, 3000);
-  });
-
-  document.getElementById('switch-to-login').addEventListener('click', () => {
-    document.getElementById('register-section').classList.add('hidden');
-    document.getElementById('login-section').classList.remove('hidden');
-  });
-
-  document.getElementById('switch-to-register').addEventListener('click', () => {
-    document.getElementById('login-section').classList.add('hidden');
-    document.getElementById('register-section').classList.remove('hidden');
-  });
-
-  document.getElementById('register-form').addEventListener('submit', function(e) {
-    e.preventDefault();
-    const firstName = document.getElementById('firstName').value;
-    alert(`Registration Successful, ${firstName}! Please login.`);
-    document.getElementById('register-form').reset();
-    document.getElementById('register-section').classList.add('hidden');
-    document.getElementById('login-section').classList.remove('hidden');
-  });
-
-  document.getElementById('login-form').addEventListener('submit', function(e) {
-    e.preventDefault();
-    const email = document.getElementById('login-email').value;
-    const name = email.split('@')[0];
-    document.getElementById('user-name').textContent = name.charAt(0).toUpperCase() + name.slice(1);
-    document.getElementById('login-section').classList.add('hidden');
-    document.getElementById('dashboard-section').classList.remove('hidden');
-    
-    // Initialize with all phones
-    displayPhones(phoneDatabase);
-  });
-
-  document.getElementById('logout-btn').addEventListener('click', () => {
-    document.getElementById('dashboard-section').classList.add('hidden');
-    document.getElementById('login-section').classList.remove('hidden');
-    document.getElementById('login-form').reset();
-  });
-
-  document.getElementById('phone-search-form').addEventListener('submit', function(e) {
-    e.preventDefault();
-    filterPhones();
-  });
-
-  document.getElementById('clear-filters').addEventListener('click', clearFilters);
-  document.getElementById('reset-search').addEventListener('click', clearFilters);
-
-  // Filter change listeners
-  ['phone-type', 'brand', 'price-range', 'rating'].forEach(id => {
-    document.getElementById(id).addEventListener('change', filterPhones);
-  });
-
-  // Modal event listeners
-  document.getElementById('close-modal').addEventListener('click', hidePhoneModal);
-  document.getElementById('phone-modal').addEventListener('click', (e) => {
-    if (e.target.id === 'phone-modal') {
-      hidePhoneModal();
-    }
-  });
-
-  // Escape key to close modal
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') {
-      hidePhoneModal();
-    }
-  });
-</script>
+        // Render the app
+        ReactDOM.render(<App />, document.getElementById('root'));
+    </script>
 </body>
 </html>

@@ -1,26 +1,16 @@
-package com.example.phonesuggester.model;
+package com.example.phonesuggester.dto;
 
 import jakarta.validation.constraints.*;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
-import org.springframework.data.mongodb.core.index.Indexed;
-
 import java.time.LocalDateTime;
 import java.util.List;
 
-@Document(collection = "phones")
-public class Phone {
-    @Id
-    private String id;
-    
+public class PhoneRequest {
     @NotBlank(message = "Phone name is required")
     @Size(min = 2, max = 100, message = "Phone name must be between 2 and 100 characters")
-    @Indexed
     private String name;
     
     @NotBlank(message = "Brand is required")
     @Size(min = 2, max = 50, message = "Brand must be between 2 and 50 characters")
-    @Indexed
     private String brand;
     
     @NotBlank(message = "Description is required")
@@ -76,43 +66,8 @@ public class Phone {
     @DecimalMin(value = "0.0", message = "Rating must be at least 0.0")
     @DecimalMax(value = "5.0", message = "Rating cannot exceed 5.0")
     private Double rating;
-    
-    @Min(value = 0, message = "Review count cannot be negative")
-    private Integer reviewCount = 0;
-    
-    private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
-
-    public Phone() {
-        this.createdAt = LocalDateTime.now();
-        this.updatedAt = LocalDateTime.now();
-    }
-
-    public Phone(String name, String brand, String description, Double price, String currency, 
-                List<String> usageTypes, String imageUrl, LocalDateTime releaseDate, 
-                Integer storageGB, Integer ramGB, Integer batteryCapacity, Double screenSize, 
-                Integer cameraCount, Double rating) {
-        this();
-        this.name = name;
-        this.brand = brand;
-        this.description = description;
-        this.price = price;
-        this.currency = currency;
-        this.usageTypes = usageTypes;
-        this.imageUrl = imageUrl;
-        this.releaseDate = releaseDate;
-        this.storageGB = storageGB;
-        this.ramGB = ramGB;
-        this.batteryCapacity = batteryCapacity;
-        this.screenSize = screenSize;
-        this.cameraCount = cameraCount;
-        this.rating = rating;
-    }
 
     // Getters and Setters
-    public String getId() { return id; }
-    public void setId(String id) { this.id = id; }
-
     public String getName() { return name; }
     public void setName(String name) { this.name = name; }
 
@@ -163,13 +118,4 @@ public class Phone {
 
     public Double getRating() { return rating; }
     public void setRating(Double rating) { this.rating = rating; }
-
-    public Integer getReviewCount() { return reviewCount; }
-    public void setReviewCount(Integer reviewCount) { this.reviewCount = reviewCount; }
-
-    public LocalDateTime getCreatedAt() { return createdAt; }
-    public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
-
-    public LocalDateTime getUpdatedAt() { return updatedAt; }
-    public void setUpdatedAt(LocalDateTime updatedAt) { this.updatedAt = updatedAt; }
-}
+} 

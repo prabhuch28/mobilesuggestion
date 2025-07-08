@@ -1,98 +1,39 @@
-package com.example.phonesuggester.model;
-
-import jakarta.validation.constraints.*;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
-import org.springframework.data.mongodb.core.index.Indexed;
+package com.example.phonesuggester.dto;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
-@Document(collection = "phones")
-public class Phone {
-    @Id
+public class PhoneResponse {
     private String id;
-    
-    @NotBlank(message = "Phone name is required")
-    @Size(min = 2, max = 100, message = "Phone name must be between 2 and 100 characters")
-    @Indexed
     private String name;
-    
-    @NotBlank(message = "Brand is required")
-    @Size(min = 2, max = 50, message = "Brand must be between 2 and 50 characters")
-    @Indexed
     private String brand;
-    
-    @NotBlank(message = "Description is required")
-    @Size(min = 10, max = 500, message = "Description must be between 10 and 500 characters")
     private String description;
-    
-    @NotNull(message = "Price is required")
-    @DecimalMin(value = "0.0", inclusive = false, message = "Price must be greater than 0")
-    @DecimalMax(value = "1000000.0", message = "Price cannot exceed 1,000,000")
     private Double price;
-    
-    @NotNull(message = "Currency is required")
-    @Pattern(regexp = "^[A-Z]{3}$", message = "Currency must be a 3-letter code (e.g., USD, EUR)")
     private String currency;
-    
-    @NotEmpty(message = "At least one usage type is required")
     private List<String> usageTypes;
-    
-    @NotBlank(message = "Image URL is required")
-    @Pattern(regexp = "^https?://.*", message = "Image URL must be a valid HTTP/HTTPS URL")
     private String imageUrl;
-    
-    @NotNull(message = "Release date is required")
     private LocalDateTime releaseDate;
-    
-    @NotNull(message = "Storage capacity is required")
-    @Min(value = 1, message = "Storage must be at least 1 GB")
     private Integer storageGB;
-    
-    @NotNull(message = "RAM capacity is required")
-    @Min(value = 1, message = "RAM must be at least 1 GB")
     private Integer ramGB;
-    
-    @NotNull(message = "Battery capacity is required")
-    @Min(value = 1000, message = "Battery capacity must be at least 1000 mAh")
     private Integer batteryCapacity;
-    
-    @NotNull(message = "Screen size is required")
-    @DecimalMin(value = "3.0", message = "Screen size must be at least 3.0 inches")
-    @DecimalMax(value = "10.0", message = "Screen size cannot exceed 10.0 inches")
     private Double screenSize;
-    
-    @NotNull(message = "Camera count is required")
-    @Min(value = 1, message = "Must have at least 1 camera")
-    @Max(value = 10, message = "Cannot have more than 10 cameras")
     private Integer cameraCount;
-    
-    private Boolean is5G = false;
-    private Boolean isWaterResistant = false;
-    private Boolean hasWirelessCharging = false;
-    
-    @NotNull(message = "Rating is required")
-    @DecimalMin(value = "0.0", message = "Rating must be at least 0.0")
-    @DecimalMax(value = "5.0", message = "Rating cannot exceed 5.0")
+    private Boolean is5G;
+    private Boolean isWaterResistant;
+    private Boolean hasWirelessCharging;
     private Double rating;
-    
-    @Min(value = 0, message = "Review count cannot be negative")
-    private Integer reviewCount = 0;
-    
+    private Integer reviewCount;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
-    public Phone() {
-        this.createdAt = LocalDateTime.now();
-        this.updatedAt = LocalDateTime.now();
-    }
+    public PhoneResponse() {}
 
-    public Phone(String name, String brand, String description, Double price, String currency, 
-                List<String> usageTypes, String imageUrl, LocalDateTime releaseDate, 
-                Integer storageGB, Integer ramGB, Integer batteryCapacity, Double screenSize, 
-                Integer cameraCount, Double rating) {
-        this();
+    public PhoneResponse(String id, String name, String brand, String description, Double price, 
+                        String currency, List<String> usageTypes, String imageUrl, LocalDateTime releaseDate,
+                        Integer storageGB, Integer ramGB, Integer batteryCapacity, Double screenSize,
+                        Integer cameraCount, Boolean is5G, Boolean isWaterResistant, Boolean hasWirelessCharging,
+                        Double rating, Integer reviewCount, LocalDateTime createdAt, LocalDateTime updatedAt) {
+        this.id = id;
         this.name = name;
         this.brand = brand;
         this.description = description;
@@ -106,7 +47,13 @@ public class Phone {
         this.batteryCapacity = batteryCapacity;
         this.screenSize = screenSize;
         this.cameraCount = cameraCount;
+        this.is5G = is5G;
+        this.isWaterResistant = isWaterResistant;
+        this.hasWirelessCharging = hasWirelessCharging;
         this.rating = rating;
+        this.reviewCount = reviewCount;
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
     }
 
     // Getters and Setters
@@ -172,4 +119,4 @@ public class Phone {
 
     public LocalDateTime getUpdatedAt() { return updatedAt; }
     public void setUpdatedAt(LocalDateTime updatedAt) { this.updatedAt = updatedAt; }
-}
+} 
