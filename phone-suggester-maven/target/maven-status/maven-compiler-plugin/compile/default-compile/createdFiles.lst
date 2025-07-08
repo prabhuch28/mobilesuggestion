@@ -1,11 +1,8 @@
 com/example/phonesuggester/dto/ApiResponse.class
-com/example/phonesuggester/repository/PhoneRepository.class
 com/example/phonesuggester/PhoneSuggesterApplication.class
 com/example/phonesuggester/dto/PhoneResponse.class
 com/example/phonesuggester/config/LocalDevelopmentConfig.class
-com/example/phonesuggester/service/AmazonService.class
 com/example/phonesuggester/dto/PhoneRequest.class
-com/example/phonesuggester/service/PhoneService.class
 com/example/phonesuggester/controller/PhoneController.class
 com/example/phonesuggester/model/Phone.class
 com/example/phonesuggester/exception/GlobalExceptionHandler.class
