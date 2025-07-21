@@ -1,231 +1,110 @@
-import { useState, useEffect } from 'react'
-import Head from 'next/head'
+import Image from 'next/image';
 
 export default function Home() {
-  const [phones, setPhones] = useState([])
-  const [loading, setLoading] = useState(true)
-  const [searchQuery, setSearchQuery] = useState('')
-  const [selectedBrand, setSelectedBrand] = useState('')
-  const [selectedType, setSelectedType] = useState('')
-
-  useEffect(() => {
-    fetchPhones()
-  }, [])
-
-  const fetchPhones = async () => {
-    try {
-      const response = await fetch('/api/v1/phones?page=0&size=20')
-      const data = await response.json()
-      if (data.success) {
-        setPhones(data.data.content || data.data)
-      }
-    } catch (error) {
-      console.error('Error fetching phones:', error)
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  const searchPhones = async () => {
-    if (!searchQuery.trim()) {
-      fetchPhones()
-      return
-    }
-    
-    try {
-      setLoading(true)
-      const response = await fetch(`/api/v1/phones/search?query=${encodeURIComponent(searchQuery)}`)
-      const data = await response.json()
-      if (data.success) {
-        setPhones(data.data)
-      }
-    } catch (error) {
-      console.error('Error searching phones:', error)
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  const filterByBrand = async (brand) => {
-    try {
-      setLoading(true)
-      const response = await fetch(`/api/v1/phones/brand/${encodeURIComponent(brand)}`)
-      const data = await response.json()
-      if (data.success) {
-        setPhones(data.data)
-      }
-    } catch (error) {
-      console.error('Error filtering by brand:', error)
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  const filterByType = async (type) => {
-    try {
-      setLoading(true)
-      const response = await fetch(`/api/v1/phones/type/${encodeURIComponent(type)}`)
-      const data = await response.json()
-      if (data.success) {
-        setPhones(data.data)
-      }
-    } catch (error) {
-      console.error('Error filtering by type:', error)
-    } finally {
-      setLoading(false)
-    }
-  }
-
   return (
-    <div className="min-h-screen bg-gray-100">
-      <Head>
-        <title>Phone Suggester - Find Your Perfect Phone</title>
-        <meta name="description" content="Modern phone suggestion application" />
-        <link rel="icon" href="/favicon.ico" />
-      </Head>
-
-      <main className="container mx-auto px-4 py-8">
-        {/* Header */}
-        <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-gray-900 mb-4">
-            📱 Phone Suggester
-          </h1>
-          <p className="text-xl text-gray-600">
-            Find your perfect phone with our intelligent suggestions
-          </p>
+    <div className="bg-gradient-to-br from-blue-50 via-purple-50 to-teal-50 min-h-screen font-sans">
+      {/* Hero Section */}
+      <section className="flex flex-col items-center justify-center py-12">
+        <div className="relative w-40 h-40 mb-6 rounded-2xl overflow-hidden shadow-xl border-4 border-blue-200">
+          <Image
+            src="/profile.jpg"
+            alt="Prabhu Chaturvedi"
+            layout="fill"
+            objectFit="cover"
+            className="rounded-2xl"
+          />
         </div>
+        <h1 className="text-4xl font-bold text-blue-900 mb-2">Prabhu Chaturvedi</h1>
+        <h2 className="text-xl text-purple-700 font-semibold mb-4">App Developer & Researcher</h2>
+        <p className="max-w-xl text-center text-gray-700 text-lg">
+          Turning ideas into impactful solutions. Passionate about building modern apps, exploring new tech, and solving real-world problems with code.
+        </p>
+      </section>
 
-        {/* Search and Filters */}
-        <div className="bg-white rounded-lg shadow-md p-6 mb-8">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            {/* Search */}
-            <div className="md:col-span-2">
-              <input
-                type="text"
-                placeholder="Search phones..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              />
-            </div>
-            <button
-              onClick={searchPhones}
-              className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-            >
-              Search
-            </button>
-            <button
-              onClick={fetchPhones}
-              className="px-6 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
-            >
-              Reset
-            </button>
+      {/* About Me */}
+      <section className="max-w-2xl mx-auto my-10 bg-white/80 rounded-xl shadow-md p-8">
+        <h3 className="text-2xl font-bold text-blue-800 mb-4">About Me</h3>
+        <p className="text-gray-800 text-lg">
+          Hi! I’m Prabhu Chaturvedi, a dedicated app developer and tech enthusiast. I enjoy working on innovative projects, from mobile apps to backend systems. My journey is driven by curiosity, creativity, and a desire to make technology accessible and useful for everyone. I thrive in collaborative environments and love learning new things every day.
+        </p>
+      </section>
+
+      {/* Skills Section */}
+      <section className="max-w-4xl mx-auto my-10">
+        <h3 className="text-2xl font-bold text-blue-800 mb-6">Skills</h3>
+        <div className="grid md:grid-cols-3 gap-4">
+          <div className="bg-white/90 rounded-lg shadow p-4">Java, Spring Boot, REST APIs</div>
+          <div className="bg-white/90 rounded-lg shadow p-4">React, JavaScript, TypeScript</div>
+          <div className="bg-white/90 rounded-lg shadow p-4">MongoDB, MySQL, SQL</div>
+          <div className="bg-white/90 rounded-lg shadow p-4">Android (Java/Kotlin)</div>
+          <div className="bg-white/90 rounded-lg shadow p-4">Git, GitHub, VS Code</div>
+          <div className="bg-white/90 rounded-lg shadow p-4">Postman, API Integration</div>
+        </div>
+      </section>
+
+      {/* Projects */}
+      <section className="max-w-4xl mx-auto my-10">
+        <h3 className="text-2xl font-bold text-blue-800 mb-6">Projects</h3>
+        <div className="grid md:grid-cols-3 gap-6">
+          {/* Project 1 */}
+          <div className="bg-white/90 rounded-lg shadow p-6 flex flex-col">
+            <h4 className="font-semibold text-lg text-purple-700 mb-2">KaryaSahayak - Smart HR Helpdesk</h4>
+            <p className="text-gray-700 flex-1 mb-2">A smart HR helpdesk system with React, TypeScript, Spring Boot & MongoDB. Streamlines HR queries and automates support for organizations.</p>
+            <a href="https://github.com/prabhuch28/karyasahayak-hr-helpdesk" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline font-medium">View on GitHub</a>
           </div>
-
-          {/* Quick Filters */}
-          <div className="mt-4 flex flex-wrap gap-2">
-            <button
-              onClick={() => filterByBrand('Apple')}
-              className="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-colors"
-            >
-              Apple
-            </button>
-            <button
-              onClick={() => filterByBrand('Samsung')}
-              className="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-colors"
-            >
-              Samsung
-            </button>
-            <button
-              onClick={() => filterByType('Gaming')}
-              className="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-colors"
-            >
-              Gaming
-            </button>
-            <button
-              onClick={() => filterByType('Photography')}
-              className="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-colors"
-            >
-              Photography
-            </button>
+          {/* Project 2 */}
+          <div className="bg-white/90 rounded-lg shadow p-6 flex flex-col">
+            <h4 className="font-semibold text-lg text-purple-700 mb-2">Pizzabill</h4>
+            <p className="text-gray-700 flex-1 mb-2">A simple pizza billing web app. Demonstrates clean UI, basic logic, and fun user experience for learning and demos.</p>
+            <a href="https://github.com/prabhuch28/Pizzabill" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline font-medium">View on GitHub</a>
+          </div>
+          {/* Project 3 */}
+          <div className="bg-white/90 rounded-lg shadow p-6 flex flex-col">
+            <h4 className="font-semibold text-lg text-purple-700 mb-2">Modern Phone Recommendation App</h4>
+            <p className="text-gray-700 flex-1 mb-2">A full-stack app to recommend smartphones based on user preferences. Built with Spring Boot and React, featuring authentication and search.</p>
+            <a href="https://github.com/prabhuch28/phone-suggester-app" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline font-medium">View on GitHub</a>
           </div>
         </div>
+      </section>
 
-        {/* Phone Grid */}
-        {loading ? (
-          <div className="text-center py-12">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-            <p className="mt-4 text-gray-600">Loading phones...</p>
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {phones.map((phone) => (
-              <div key={phone.id} className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
-                <div className="p-6">
-                  <div className="flex items-center justify-between mb-4">
-                    <h3 className="text-xl font-semibold text-gray-900">{phone.name}</h3>
-                    <span className="text-sm text-gray-500">{phone.brand}</span>
-                  </div>
-                  
-                  <p className="text-gray-600 mb-4 line-clamp-2">{phone.description}</p>
-                  
-                  <div className="flex items-center justify-between mb-4">
-                    <span className="text-2xl font-bold text-blue-600">
-                      ${phone.price}
-                    </span>
-                    <div className="flex items-center">
-                      <span className="text-yellow-500">★</span>
-                      <span className="ml-1 text-sm text-gray-600">{phone.rating}</span>
-                    </div>
-                  </div>
+      {/* Education Section */}
+      <section className="max-w-4xl mx-auto my-10">
+        <h3 className="text-2xl font-bold text-blue-800 mb-6">Education</h3>
+        <div className="bg-white/90 rounded-lg shadow p-6">
+          <h4 className="font-semibold text-lg text-purple-700">Bachelor of Technology in Computer Science</h4>
+          <span className="text-gray-600">XYZ University • 2020 - 2024</span>
+          <p className="text-gray-700 mt-2">Relevant coursework: Data Structures, Algorithms, Web Development, Mobile App Development, Databases.</p>
+        </div>
+      </section>
 
-                  <div className="grid grid-cols-2 gap-2 text-sm text-gray-500 mb-4">
-                    <div>Storage: {phone.storageGB}GB</div>
-                    <div>RAM: {phone.ramGB}GB</div>
-                    <div>Battery: {phone.batteryCapacity}mAh</div>
-                    <div>Screen: {phone.screenSize}"</div>
-                  </div>
+      {/* Testimonials Section */}
+      <section className="max-w-4xl mx-auto my-10">
+        <h3 className="text-2xl font-bold text-blue-800 mb-6">Testimonials</h3>
+        <div className="bg-white/90 rounded-lg shadow p-6 mb-4">
+          <p className="text-gray-800 italic">“Prabhu is a quick learner and a dedicated developer. He brings creativity and energy to every project.”</p>
+          <span className="block text-right text-gray-600 mt-2">— Mentor, Tech Company</span>
+        </div>
+        <div className="bg-white/90 rounded-lg shadow p-6">
+          <p className="text-gray-800 italic">“A great team player and problem solver. Highly recommend for any tech project!”</p>
+          <span className="block text-right text-gray-600 mt-2">— Peer, University Project</span>
+        </div>
+      </section>
 
-                  <div className="flex flex-wrap gap-1">
-                    {phone.usageTypes.map((type, index) => (
-                      <span
-                        key={index}
-                        className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full"
-                      >
-                        {type}
-                      </span>
-                    ))}
-                  </div>
-
-                  <div className="mt-4 flex flex-wrap gap-2">
-                    {phone.is5G && (
-                      <span className="px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full">
-                        5G
-                      </span>
-                    )}
-                    {phone.isWaterResistant && (
-                      <span className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full">
-                        Water Resistant
-                      </span>
-                    )}
-                    {phone.hasWirelessCharging && (
-                      <span className="px-2 py-1 bg-purple-100 text-purple-800 text-xs rounded-full">
-                        Wireless Charging
-                      </span>
-                    )}
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
-
-        {!loading && phones.length === 0 && (
-          <div className="text-center py-12">
-            <p className="text-gray-600">No phones found. Try adjusting your search criteria.</p>
-          </div>
-        )}
-      </main>
+      {/* Contact */}
+      <section className="max-w-2xl mx-auto my-10 bg-white/80 rounded-xl shadow-md p-8">
+        <h3 className="text-2xl font-bold text-blue-800 mb-4">Contact</h3>
+        <div className="flex flex-wrap gap-4 mb-6">
+          <a href="https://www.linkedin.com/in/prabhu-chaturvedi-491563247/" target="_blank" rel="noopener noreferrer" className="bg-blue-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-blue-700">LinkedIn</a>
+          <a href="https://github.com/prabhuch28" target="_blank" rel="noopener noreferrer" className="bg-gray-900 text-white px-4 py-2 rounded-lg font-medium hover:bg-gray-800">GitHub</a>
+          <a href="mailto:your.email@example.com" className="bg-teal-500 text-white px-4 py-2 rounded-lg font-medium hover:bg-teal-600">Email</a>
+        </div>
+        <form className="flex flex-col gap-4">
+          <input type="text" placeholder="Your Name" className="border rounded-lg p-2" />
+          <input type="email" placeholder="Your Email" className="border rounded-lg p-2" />
+          <textarea placeholder="Your Message" className="border rounded-lg p-2" rows={4}></textarea>
+          <button type="submit" className="bg-blue-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-blue-700">Send Message</button>
+        </form>
+      </section>
     </div>
-  )
+  );
 } 

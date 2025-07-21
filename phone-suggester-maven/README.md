@@ -1,30 +1,37 @@
-# Phone Suggester - Modern Phone Recommendation System
+# Phone Suggester - Modern Phone Recommendation App
 
-A modern, scalable phone recommendation application built with Spring Boot 3 and React. This application provides intelligent phone suggestions based on user preferences and requirements.
+A Spring Boot application that helps users find the perfect smartphone based on their preferences and requirements.
 
-## 🚀 Features
+## Features
 
-- **RESTful API** with OpenAPI/Swagger documentation
-- **In-memory mode** for local development (no database or Redis required!)
-- **Spring Security** for API protection
-- **Validation** with comprehensive error handling
-- **Pagination** and sorting support
-- **Health checks** and monitoring with Actuator
-- **Modern React UI** with Tailwind CSS
+- **User Authentication**: Register and login functionality
+- **Category Selection**: Browse phones by different categories
+- **Phone Recommendations**: View detailed phone information with specifications
+- **Search & Filter**: Search phones by brand, price range, and usage type
+- **Responsive Design**: Modern UI built with React and Tailwind CSS
 
-## 🛠️ Technology Stack
+## Tech Stack
 
-- **Java 21**
-- **Spring Boot 3.2.5**
-- **React 18** (served from `/src/main/resources/static/index.html`)
-- **Maven**
+### Backend
+- **Spring Boot 3.2.5** - Main framework
+- **MongoDB** - Database
+- **Spring Security** - Authentication and authorization
+- **Spring Data MongoDB** - Data access layer
+- **OpenAPI/Swagger** - API documentation
 
-## 📋 Prerequisites
+### Frontend
+- **React** - UI framework
+- **Tailwind CSS** - Styling
+- **Font Awesome** - Icons
 
-- Java 21 or higher
-- Maven 3.8+
+## Quick Start
 
-## 🚀 Quick Start (Local Development)
+### Prerequisites
+- Java 21
+- Maven 3.6+
+- MongoDB (local or cloud)
+
+### Running the Application
 
 1. **Clone the repository**
    ```bash
@@ -32,55 +39,159 @@ A modern, scalable phone recommendation application built with Spring Boot 3 and
    cd phone-suggester-maven
    ```
 
-2. **Run the application**
+2. **Configure MongoDB**
+   - Set up MongoDB locally or use MongoDB Atlas
+   - Update `application.properties` with your MongoDB connection string
+
+3. **Build and run**
    ```bash
-   mvn clean spring-boot:run
+   mvn clean package -DskipTests
+   java -jar target/phone-suggester-0.0.1-SNAPSHOT.jar
    ```
 
-   > The app runs in **in-memory mode** by default. No MongoDB or Redis is required for local testing!
+4. **Access the application**
+   - Frontend: http://localhost:8080
+   - API Documentation: http://localhost:8080/swagger-ui.html
 
-3. **Access the application**
-   - Frontend: [http://localhost:8081](http://localhost:8081)
-   - API Documentation: [http://localhost:8081/swagger-ui.html](http://localhost:8081/swagger-ui.html)
+## API Endpoints
 
-## 📚 API Documentation
+### Authentication
+- `POST /api/v1/auth/register` - Register new user
+- `POST /api/v1/auth/login` - User login
 
-See [http://localhost:8081/swagger-ui.html](http://localhost:8081/swagger-ui.html) after starting the app.
+### Categories
+- `GET /api/v1/categories` - Get all categories
+- `GET /api/v1/categories/{id}` - Get category by ID
+- `POST /api/v1/categories` - Create new category
 
-## 🏗️ Project Structure
+### Phones
+- `GET /api/v1/phones` - Get all phones (paginated)
+- `GET /api/v1/phones/{id}` - Get phone by ID
+- `GET /api/v1/phones/search?query={query}` - Search phones
+- `GET /api/v1/phones/brand/{brand}` - Get phones by brand
+- `GET /api/v1/phones/price-range?minPrice={min}&maxPrice={max}` - Get phones by price range
+
+## Usage
+
+1. **Register/Login**: Create an account or login with existing credentials
+2. **Select Category**: Choose a phone category (Gaming, Camera, Business, etc.)
+3. **Browse Phones**: View phone recommendations with detailed specifications
+4. **Search & Filter**: Use search and filter options to find specific phones
+5. **View Details**: Click on phones to see detailed information
+
+## Deployment
+
+### Backend Deployment (Render.com)
+1. Create a new Web Service on Render
+2. Connect your GitHub repository
+3. Set build command: `mvn clean package -DskipTests`
+4. Set start command: `java -jar target/phone-suggester-0.0.1-SNAPSHOT.jar`
+5. Add environment variables:
+   - `MONGODB_URI`: Your MongoDB connection string
+   - `PORT`: 8080
+
+### Frontend Deployment (Netlify)
+1. Create a new site on Netlify
+2. Connect your GitHub repository
+3. Set build command: `npm run build` (if using separate frontend)
+4. Set publish directory: `dist` or `build`
+
+## Project Structure
 
 ```
-phone-suggester-maven/
-├── src/
-│   ├── main/
-│   │   ├── java/com/example/phonesuggester/
-│   │   │   ├── config/           # Configuration classes
-│   │   │   ├── controller/       # REST controllers
-│   │   │   ├── dto/             # Data Transfer Objects
-│   │   │   ├── exception/       # Exception handlers
-│   │   │   ├── model/           # Entity models
-│   │   │   ├── repository/      # Data access layer
-│   │   │   ├── service/         # Business logic
-│   │   │   └── PhoneSuggesterApplication.java
-│   │   └── resources/
-│   │       ├── static/          # Frontend assets
-│   │       └── application.properties
-│   └── test/                    # Test files
-├── pom.xml                     # Maven dependencies
-└── README.md                   # This file
+src/main/java/com/example/phonesuggester/
+├── controller/          # REST controllers
+├── service/            # Business logic
+├── repository/         # Data access layer
+├── model/             # Entity models
+├── dto/               # Data transfer objects
+├── config/            # Configuration classes
+└── exception/         # Exception handlers
 ```
 
-## 🧪 Testing
+## Contributing
 
-Run all tests:
-```bash
-mvn test
-```
+This is a student project demonstrating modern web development practices with Spring Boot and React.
 
-## 📝 License
+## License
 
-This project is licensed under the MIT License.
+This project is for educational purposes. 
 
 ---
 
-**Built with ❤️ using modern Java and React technologies** 
+## ✅ **Next Steps to Deploy**
+
+### 1. **Build Your Project**
+In your project directory, run:
+```bash
+mvn clean package -DskipTests
+```
+- If this succeeds, you’ll see a `target/phone-suggester-0.0.1-SNAPSHOT.jar` file.
+
+---
+
+### 2. **Choose Your Deployment Option**
+
+#### **A. Local Deployment (Easiest)**
+Run your app locally:
+```bash
+java -jar target/phone-suggester-0.0.1-SNAPSHOT.jar
+```
+- Open [http://localhost:8080](http://localhost:8080) in your browser.
+
+#### **B. Deploy Frontend Only (UI Demo)**
+- Copy your `index.html` (and any CSS/JS) from `src/main/resources/static/` to a new folder.
+- Go to [netlify.com](https://netlify.com) or [vercel.com](https://vercel.com).
+- Drag and drop your folder to deploy your UI.
+
+#### **C. Deploy Full App (Backend + Frontend)**
+- Use Railway, Render, or Heroku.
+- Make sure your build and start commands are:
+  - **Build Command:** `mvn clean package -DskipTests`
+  - **Start Command:** `java -jar target/phone-suggester-0.0.1-SNAPSHOT.jar`
+- Set up any required environment variables (like `MONGODB_URI` if using a database).
+
+---
+
+## ⚡️ **Summary**
+- If your Maven build works, you can deploy!
+- For a public demo, Netlify/Vercel (UI only) is fastest.
+- For a full product, use Railway/Render/Heroku with the correct Java version and build commands.
+
+---
+
+**If you want step-by-step deployment for a specific platform, just tell me which one (Netlify, Railway, etc.) and I’ll guide you!** 
+
+Currently, there is no portfolio page or homepage in your frontend project—both portfolio.js and index.js have been deleted. This means there is nothing to view or deploy at the moment, so no link can be provided.
+
+**Next Steps:**
+1. I can create a brand new portfolio homepage (index.js) for you with all the sections you want.
+2. Once created, you can view it locally at:
+   ```
+   http://localhost:3000/
+   ```
+   or, after deployment, at your Vercel/Netlify public link.
+
+Would you like me to scaffold a new portfolio homepage for you now? If yes, I’ll set it up and then you’ll have a working link! 
+
+Your new portfolio homepage is now created! You can view it at:
+
+```
+http://localhost:3000/
+```
+
+**Next Steps to Deploy on Vercel:**
+
+1. Make sure your photo is saved as `profile.jpg` in `phone-suggester-maven/frontend/public/`.
+2. Commit all your changes to git.
+3. Push your code to GitHub (if not already).
+4. Go to [vercel.com](https://vercel.com/), sign in with GitHub, and import your repository.
+5. Set the project root to `phone-suggester-maven/frontend` during setup.
+6. Click “Deploy”.
+
+After deployment, Vercel will give you a public link like:
+```
+https://your-project-name.vercel.app/
+```
+
+If you want, I can guide you step-by-step through the Vercel deployment process or help you with any part of it! 

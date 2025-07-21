@@ -42,7 +42,7 @@ public class Phone {
     @NotBlank(message = "Image URL is required")
     @Pattern(regexp = "^https?://.*", message = "Image URL must be a valid HTTP/HTTPS URL")
     private String imageUrl;
-    
+
     @NotNull(message = "Release date is required")
     private LocalDateTime releaseDate;
     
